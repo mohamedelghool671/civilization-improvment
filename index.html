@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Civilization improvement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: purple;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #tapButton {
+            font-size: 24px;
+            padding: 10px 20px;
+        }
+        .button {
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 350px; /* تم تكبير الزر */
+            height: 350px; /* تم تكبير الزر */
+            font-size: 20px; /* تم تكبير حجم الخط */
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        #score, #timer {
+            margin-top: 20px; /* تم إضافة هامش علوي */
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Civilization improvement</h1>
+    <button id="tapButton" class="button">tap tap</button> <!-- تم تصحيح معرف الزر -->
+    <p style="font-size: 30px;">Points: <span id="score">0</span></p>
+    <p id="timer"></p>
+
+
+
+    <script>
+        let score = 0;
+        let lastTapTime = 0;
+        const cooldownTime = 8 * 60 * 60 * 1000; // 8 ساعات بالميلي ثانية
+
+        const scoreElement = document.getElementById('score');
+        const tapButton = document.getElementById('tapButton');
+        const timerElement = document.getElementById('timer');
+
+        tapButton.addEventListener('click', handleTap);
+
+        function handleTap() {
+            const currentTime = new Date().getTime();
+            if (currentTime - lastTapTime >= cooldownTime) {
+                score++;
+                scoreElement.textContent = score;
+                lastTapTime = currentTime;
+                localStorage.setItem('score', score);
+                localStorage.setItem('lastTapTime', lastTapTime);
+                updateTimer();
+            } /*else {
+                alert('يرجى الانتظار قبل النقر مرة أخرى!');
+            }*/
+        }
+
+        function updateTimer() {
+            const currentTime = new Date().getTime();
+            const timeLeft = cooldownTime - (currentTime - lastTapTime);
+            if (timeLeft > 0) {
+                const hours = Math.floor(timeLeft / (60 * 60 * 1000));
+                const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+                const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+                timerElement.textContent = `الوقت المتبقي: ${hours} ساعة ${minutes} دقيقة ${seconds} ثانية`;
+                setTimeout(updateTimer, 1000);
+            } else {
+                timerElement.textContent = ' tap again !';
+            }
+        }
+
+        // استعادة البيانات المحفوظة
+        const savedScore = localStorage.getItem('score');
+        const savedLastTapTime = localStorage.getItem('lastTapTime');
+        if (savedScore && savedLastTapTime) {
+            score = parseInt(savedScore);
+            lastTapTime = parseInt(savedLastTapTime);
+            scoreElement.textContent = score;
+            updateTimer();
+        }
+    </script>
+</body>
+</html>
